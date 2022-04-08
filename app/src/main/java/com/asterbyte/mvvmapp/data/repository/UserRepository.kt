@@ -2,8 +2,9 @@ package com.asterbyte.mvvmapp.data.repository
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.asterbyte.mvvmapp.data.Credentials
+import com.asterbyte.mvvmapp.data.LoginResponse
 import com.asterbyte.mvvmapp.data.networkk.MyApi
-import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Response
 
@@ -12,18 +13,17 @@ class UserRepository {
   fun userLogin(email: String, password: String): LiveData<String> {
 
     val loginResponse = MutableLiveData<String>()
-
-    MyApi().userLogin(email, password)
-      .enqueue(object : retrofit2.Callback<ResponseBody> {
-        override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+    MyApi().userLogin(Credentials(email, password))
+      .enqueue(object : retrofit2.Callback<LoginResponse> {
+        override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
           if (response.isSuccessful) {
-            loginResponse.value = response.body().toString()
+            loginResponse.value = response.body()?.message
           } else {
-            loginResponse.value = response.errorBody().toString()
+            loginResponse.value = response.body()?.message
           }
         }
 
-        override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+        override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
           loginResponse.value = t.message
         }
 
