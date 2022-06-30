@@ -7,24 +7,25 @@ import com.asterbyte.mvvmapp.data.LoginResponse
 import com.asterbyte.mvvmapp.data.networkk.MyApi
 import retrofit2.Call
 import retrofit2.Response
+import javax.inject.Inject
 
-class UserRepository {
+class UserRepository @Inject constructor(private val retrofit: MyApi) {
 
-  fun userLogin(email: String, password: String): LiveData<String> {
+  fun userLogin(email: String, password: String): LiveData<LoginResponse> {
 
-    val loginResponse = MutableLiveData<String>()
-    MyApi().userLogin(Credentials(email, password))
+    val loginResponse = MutableLiveData<LoginResponse>()
+    retrofit.userLogin(Credentials(email, password))
       .enqueue(object : retrofit2.Callback<LoginResponse> {
         override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
           if (response.isSuccessful) {
-            loginResponse.value = response.body()?.message
+            loginResponse.value = response.body()
           } else {
-            loginResponse.value = response.body()?.message
+            loginResponse.value = response.body()
           }
         }
 
         override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
-          loginResponse.value = t.message
+          loginResponse.value?.message = t.message
         }
 
       })

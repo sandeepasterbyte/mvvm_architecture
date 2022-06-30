@@ -3,12 +3,17 @@ package com.asterbyte.mvvmapp.activtiy
 import android.view.View
 import androidx.lifecycle.ViewModel
 import com.asterbyte.mvvmapp.data.repository.UserRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class AuthViewModel : ViewModel() {
+@HiltViewModel
+class AuthViewModel @Inject constructor() : ViewModel() {
   var email: String? = null
   var password: String? = null
 
   var authListener: AuthListener? = null
+  @Inject
+  lateinit var userRepository: UserRepository
 
   fun onLoginButtonClick(view: View) {
     authListener?.onStarted()
@@ -16,7 +21,7 @@ class AuthViewModel : ViewModel() {
       authListener?.onFailure("Email or password is empty")
       return
     }
-    val loginResponse = UserRepository().userLogin(email!!, password!!)
+    val loginResponse = userRepository.userLogin(email!!, password!!)
     authListener?.onSuccess(loginResponse)
   }
 }
